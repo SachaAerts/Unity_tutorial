@@ -20,7 +20,6 @@ public class LifePlayer : MonoBehaviour
 
     void Start()
     {
-        // Réinitialiser la vie au démarrage de la scène
         life = maxLife;
         UpdateLifeDisplay();
     }
@@ -29,7 +28,6 @@ public class LifePlayer : MonoBehaviour
     {
         UpdateLifeDisplay();
         
-        // Vérifier si le joueur est mort
         if (IsPlayerDead())
         {
             HandlePlayerDeath();
@@ -61,9 +59,9 @@ public class LifePlayer : MonoBehaviour
 
     private void HandlePlayerDeath()
     {
-        // Appeler le GameManager pour terminer le jeu
         if (GameManager.Instance != null)
         {
+            Cursor.visible = true;
             GameManager.Instance.EndGame();
         }
     }
