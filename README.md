@@ -1,4 +1,4 @@
-# Tutorial Unity
+# Tutoriel Unity - Capsule shooter
 
 ## Description
 
