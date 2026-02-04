@@ -22,7 +22,7 @@ Le jeu est un **survival top-down** : le joueur contrôle un personnage vu de de
 
 1. Cloner le repository
 2. Ouvrir le projet dans Unity Hub
-3. Lancer la scène principale depuis l'éditeur Unity
+3. Lancer la scène MenuScene depuis l'éditeur Unity
 
 ## Objectifs du projet
 
