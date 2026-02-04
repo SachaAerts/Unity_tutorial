@@ -1,8 +1,6 @@
-using NUnit.Framework.Internal;
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 
-public class Ennemy : MonoBehaviour
+public class Enemy : MonoBehaviour
 {
     private Transform player;
 
@@ -31,11 +29,17 @@ public class Ennemy : MonoBehaviour
     public void TakeDamages(int playerDamages)
     {
         ennemyStatistics.TakeDamages(playerDamages);
-        
+    }
+
+    public bool IsPlayerKilledEnemy()
+    {
         if (ennemyStatistics.IsEnemyDead())
         {
             Destroy(gameObject);
+            return true;
         }
+
+        return false;
     }
 
     private void InitiateStats()

@@ -1,19 +1,7 @@
-public class PlayerStatistics
+public record PlayerStatistics
 {
-    public int Health = 3;
-
-    public float Range = 4f;
-
-    public float Speed = 10f;
-
-    public int Damages = 50;
-
-    public float fireRate = 0.2f;
-
-    public void TakeDamages()
-    {
-        Health -= 1;
-    }
-
-    // TODO: Faire logique pour fin de partie quand 0 pv restant
+    public float Range { get; } = 4f;
+    public float Speed { get; } = 10f;
+    public int Damages { get; } = 50;
+    public float FireRate { get; } = 0.2f;
 }

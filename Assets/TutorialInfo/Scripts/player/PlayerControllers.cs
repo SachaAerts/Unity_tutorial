@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -6,8 +5,10 @@ using UnityEngine.InputSystem;
 public class PlayerControllers : MonoBehaviour
 {
     [Header("Systems")]
-    private PlayerStatistics playerStatistics;
     private LaserSystem laserSystem;
+
+    [Header("Player stats")]
+    private PlayerStatistics playerStatistics;
 
     [Header("Combat State")]
     private bool isFiring = false;
@@ -15,6 +16,9 @@ public class PlayerControllers : MonoBehaviour
 
     [Header("Movement State")]
     private Vector2 moveInput = Vector2.zero;
+
+    [Header("Camera")]
+    [SerializeField] private Transform playerCamera;
 
     void Start()
     {
@@ -24,13 +28,9 @@ public class PlayerControllers : MonoBehaviour
 
     void Update()
     {
-        if (moveInput.sqrMagnitude > 0)
-        {
-            Vector3 moveDirection = new Vector3(moveInput.x, 0, moveInput.y);
-            transform.Translate(moveDirection.normalized * playerStatistics.Speed * Time.deltaTime);
-        }
+        HandleMovement();
 
-        if (isFiring && Time.time - lastFireTime >= playerStatistics.fireRate)
+        if (isFiring && Time.time - lastFireTime >= playerStatistics.FireRate)
         {
             Shoot();
             lastFireTime = Time.time;
@@ -43,8 +43,27 @@ public class PlayerControllers : MonoBehaviour
     {
         if (collisionInfo.collider.CompareTag("Ennemy"))
         {
-            playerStatistics.TakeDamages();
+            LifePlayer.TakeDamages();
         }      
+    }
+
+    private void HandleMovement()
+    {
+        if (moveInput.sqrMagnitude > 0)
+        {
+            Vector3 cameraForward = playerCamera.transform.forward;
+            Vector3 cameraRight = playerCamera.transform.right;
+            
+            cameraForward.y = 0;
+            cameraRight.y = 0;
+            
+            cameraForward.Normalize();
+            cameraRight.Normalize();
+            
+            Vector3 moveDirection = cameraRight * moveInput.x + cameraForward * moveInput.y;
+            
+            transform.position += playerStatistics.Speed * Time.deltaTime * moveDirection.normalized;
+        }
     }
 
     private void Shoot()
@@ -53,12 +72,22 @@ public class PlayerControllers : MonoBehaviour
         {
             if (hit.collider.CompareTag("Ennemy"))
             {
-                Ennemy ennemy = hit.collider.GetComponent<Ennemy>();
-                ennemy.TakeDamages(playerStatistics.Damages);
+                Enemy enemy = hit.collider.GetComponent<Enemy>();
+                enemy.TakeDamages(playerStatistics.Damages);
+
+                VerifEnemyDeath(enemy);
             }
         }
 
         laserSystem.laserFlashTimer = laserSystem.laserFlashDuration;
+    }
+
+    private void VerifEnemyDeath(Enemy enemy)
+    {
+        if (enemy.IsPlayerKilledEnemy())
+        {
+            ScorePlayer.IncrementScore();
+        }
     }
     
     #region Inputs Actions Callbacks

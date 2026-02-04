@@ -1,5 +1,3 @@
-using Unity.VisualScripting;
-
 public class EnemyStatistics
 {
     public float Speed;
@@ -15,6 +13,6 @@ public class EnemyStatistics
 
     public bool IsEnemyDead()
     {
-        return (Health <= 0);
+        return Health <= 0;
     }
 }
