@@ -1,34 +1,42 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(LineRenderer))]
-public class Player : MonoBehaviour
+public class PlayerControllers : MonoBehaviour
 {
+    [Header("Systems")]
     private PlayerStatistics playerStatistics;
+    private LaserSystem laserSystem;
 
-    private LineRenderer lineRenderer;
+    [Header("Combat State")]
+    private bool isFiring = false;
+    private float lastFireTime = 0f;
 
+    [Header("Movement State")]
     private Vector2 moveInput = Vector2.zero;
 
     void Start()
     {
         playerStatistics = new();
-        InitiateLazer();
+        laserSystem = new(gameObject);
     }
 
     void Update()
     {
-        Vector3 startPoint = transform.position;
-        Vector3 endPoint = startPoint + transform.forward * playerStatistics.Range;
-
         if (moveInput.sqrMagnitude > 0)
         {
             Vector3 moveDirection = new Vector3(moveInput.x, 0, moveInput.y);
             transform.Translate(moveDirection.normalized * playerStatistics.Speed * Time.deltaTime);
         }
-        
-        lineRenderer.SetPosition(0, startPoint);
-        lineRenderer.SetPosition(1, endPoint);
+
+        if (isFiring && Time.time - lastFireTime >= playerStatistics.fireRate)
+        {
+            Shoot();
+            lastFireTime = Time.time;
+        }
+
+        laserSystem.UpdateLaserVisual(gameObject, playerStatistics.Range);
     }
 
     void OnCollisionEnter(Collision collisionInfo)
@@ -39,7 +47,7 @@ public class Player : MonoBehaviour
         }      
     }
 
-    private void Raycast()
+    private void Shoot()
     {
         if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, playerStatistics.Range))
         {
@@ -49,38 +57,23 @@ public class Player : MonoBehaviour
                 ennemy.TakeDamages(playerStatistics.Damages);
             }
         }
-    }
 
-    private void InitiateLazer()
-    {
-        lineRenderer = GetComponent<LineRenderer>();
-
-        lineRenderer.positionCount = 2;
-        lineRenderer.startWidth = 0.05f;
-        lineRenderer.endWidth = 0.02f;
-
-        Shader shader = Shader.Find("Universal Render Pipeline/Unlit");
-
-        if (shader != null)
-        {
-            lineRenderer.material = new Material(shader)
-            {
-                color = Color.red
-            };
-        }
-        else
-        {
-            Debug.LogError("Shader not found !");
-        }
+        laserSystem.laserFlashTimer = laserSystem.laserFlashDuration;
     }
     
     #region Inputs Actions Callbacks
 
     public void OnFire(InputAction.CallbackContext ctx)
     {
-        if(ctx.started) 
+        if (ctx.started)
         {
-            Raycast();
+            isFiring = true;
+            Shoot();
+            lastFireTime = Time.time;
+        }
+        else if (ctx.canceled)
+        {
+            isFiring = false;
         }
     }
 

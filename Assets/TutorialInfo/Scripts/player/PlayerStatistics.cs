@@ -6,7 +6,9 @@ public class PlayerStatistics
 
     public float Speed = 10f;
 
-    public int Damages = 10;
+    public int Damages = 50;
+
+    public float fireRate = 0.2f;
 
     public void TakeDamages()
     {

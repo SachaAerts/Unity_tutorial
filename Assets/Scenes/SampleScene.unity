@@ -386,6 +386,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   player: {fileID: 1017987441}
   cameraPosition: {x: 0, y: 21, z: -2}
+  cameraPlayer: {fileID: 330585546}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -1024,6 +1025,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5b21843c9bdb1148a2a3dbcb0b1dbbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
+  fireRate: 0.2
+  laserFlashDuration: 0.1
 --- !u!54 &1017987443
 Rigidbody:
   m_ObjectHideFlags: 0

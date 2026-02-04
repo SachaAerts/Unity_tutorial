@@ -1,28 +1,39 @@
-using System.Collections;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 
-public class MobsSpawner: MonoBehaviour
+public class MobsSpawner : MonoBehaviour
 {
     [SerializeField] private Transform player;
-
     [SerializeField] private BoxCollider ground;
-
     [SerializeField] private GameObject enemyPrefab;
 
     private readonly float spawnInterval = 1f;
+    private readonly int minDistanceFromPlayer = 7;
 
-    private readonly int minDistance = 7;
+    private CancellationTokenSource cancellationTokenSource;
 
     void Start()
     {
-        StartCoroutine(SpawnRoutine());
+        cancellationTokenSource = new CancellationTokenSource();
+        _ = SpawnRoutine(cancellationTokenSource.Token);
     }
 
-    private IEnumerator SpawnRoutine()
+    void OnDestroy()
     {
-        while(true)
+        cancellationTokenSource?.Cancel();
+        cancellationTokenSource?.Dispose();
+    }
+
+    private async Task SpawnRoutine(CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested)
         {
-            yield return new WaitForSeconds(spawnInterval);
+            await Task.Delay((int)(spawnInterval * 1000), cancellationToken);
+            
+            if (this == null || cancellationToken.IsCancellationRequested)
+                break;
+                
             SpawnMob();
         }
     }
@@ -34,10 +45,10 @@ public class MobsSpawner: MonoBehaviour
         float coordX = Random.Range(bounds.min.x, bounds.max.x);
         float coordZ = Random.Range(bounds.min.z, bounds.max.z);
         float coordY = bounds.max.y + 1f;
-        
+
         Vector3 spawn = new(coordX, coordY, coordZ);
 
-        if(Vector3.Distance(spawn, player.position) > minDistance)
+        if (Vector3.Distance(spawn, player.position) > minDistanceFromPlayer)
         {
             Instantiate(enemyPrefab, spawn, Quaternion.identity);
         }
